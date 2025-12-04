@@ -5,7 +5,7 @@ Modern todo application built with Python, FastAPI, HTMX, and Shoelace Web Compo
 ## Quick Start
 
 ```bash
-# User run.sh to sync dependencies and start the server
+# Use run.sh to sync dependencies and start the server
 ./run.sh
 
 # Alternatively, manual sync and run:
