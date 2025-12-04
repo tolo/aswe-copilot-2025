@@ -26,7 +26,7 @@
 ### 2. Fork the Repository 
 <img src="assets/fork.png" height="30"/>
 
-### 3.1 Use Dev Container
+### 3. Use Dev Container
 
 #### Clone Project in VS Code
 - Open VS Code
@@ -40,7 +40,7 @@
 - If not prompted, open the Command Palette (`Cmd+Shift+P` or `Ctrl+Shift+P`), type "Dev Containers: Reopen in Container", and select it.<br/>
 - Let VS Code build and start the Dev Container. _This may take several minutes on first run._
 
-### 3.2 - _Alternative_: Use GitHub Codespaces
+### 3 (Alternative): Use GitHub Codespaces
 - Click "Code" and then "Create codespace on main" in the GitHub UI<br/>
     <img src="assets/code.png" height="30"/><br/>
     <img src="assets/codespacer.png" height="30"/>
@@ -50,7 +50,7 @@
 ### 4. Set Up Environment Variables
 After project has finished loading in Dev Container or Codespace:
 - Create a copy of the `.env.example` file and name it `.env`
-- Add the Gemini API key to the `.env` file: - **This key will be shared during the workshop** 
+- Add the Gemini API key to the `.env` file: **This key will be shared during the workshop** 
     ```
     GEMINI_API_KEY=your_gemini_api_key_here
     ```
@@ -146,4 +146,4 @@ https://docs.github.com/en/copilot/how-tos/configure-personal-settings/configure
 ### Interesting Readings / Viewing
 - [Simon Willison - The Lethal Trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)
 - [YouTube - The Message Every Engineer Needs to Hear](https://www.youtube.com/watch?v=XKCBcScElBg)
-- More comping soon...
+- More coming soon...
