@@ -1,16 +1,26 @@
-{% set current_list = list if list is defined else active_list %}
+{% include "partials/todo_list_item.html" %}
+
+<!-- Out-of-band update for title data when list is updated -->
+<div id="title-data" 
+     hx-swap-oob="true"
+     data-list-name="{{ list.name }}" 
+     data-incomplete-count="{{ list.todos | selectattr('is_completed', 'false') | list | length }}"
+     style="display: none;"></div>
+
+<!-- Out-of-band update for list header -->
 <div class="list-content" id="list-content"
-     data-list-id="{{ current_list.id }}"
-     data-list-name="{{ current_list.name | e }}"
-     data-list-description="{{ (current_list.description or '') | e }}"
-     data-list-color="{{ current_list.color }}">
+     hx-swap-oob="true"
+     data-list-id="{{ list.id }}"
+     data-list-name="{{ list.name | e }}"
+     data-list-description="{{ (list.description or '') | e }}"
+     data-list-color="{{ list.color }}">
     <div class="list-header">
         <div class="list-header-info">
-            <div class="list-header-color" style="background-color: {{ current_list.color }}"></div>
+            <div class="list-header-color" style="background-color: {{ list.color }}"></div>
             <div>
-                <h2>{{ current_list.name }}</h2>
-                {% if current_list.description %}
-                <p class="list-header-description">{{ current_list.description }}</p>
+                <h2>{{ list.name }}</h2>
+                {% if list.description %}
+                <p class="list-header-description">{{ list.description }}</p>
                 {% endif %}
             </div>
         </div>
@@ -18,12 +28,12 @@
             <sl-icon-button name="pencil"
                             label="Edit list"
                             class="edit-list-header-btn"
-                            onclick="openEditListDialog('{{ current_list.id }}', '{{ current_list.name | e }}', '{{ (current_list.description or '') | e }}', '{{ current_list.color }}')">
+                            onclick="openEditListDialog('{{ list.id }}', '{{ list.name | e }}', '{{ (list.description or '') | e }}', '{{ list.color }}')">
             </sl-icon-button>
             <sl-icon-button name="trash"
                             label="Delete list"
                             class="delete-list-header-btn danger-icon"
-                            onclick="confirmDeleteList('{{ current_list.id }}', '{{ current_list.name | e }}')">
+                            onclick="confirmDeleteList('{{ list.id }}', '{{ list.name | e }}')">
             </sl-icon-button>
         </div>
     </div>
@@ -37,7 +47,7 @@
             hx-trigger="keyup changed delay:300ms, search"
             hx-target="#todos-list"
             hx-swap="innerHTML"
-            hx-vals='{"list_id": "{{ current_list.id }}"}'
+            hx-vals='{"list_id": "{{ list.id }}"}'
             name="q">
             <sl-icon slot="prefix" name="search"></sl-icon>
         </sl-input>
@@ -49,7 +59,7 @@
           hx-target="#todos-list"
           hx-swap="beforeend"
           hx-on::after-request="if(event.detail.successful) this.reset()">
-        <input type="hidden" name="list_id" value="{{ current_list.id }}">
+        <input type="hidden" name="list_id" value="{{ list.id }}">
         <sl-input
             name="title"
             placeholder="Add a new todo..."
@@ -64,13 +74,8 @@
 
     <!-- Todos list -->
     <div id="todos-list" class="todos-list">
-        {% include "partials/todos_list.html" %}
+        {% for todo in list.todos %}
+        {% include "partials/todo_item.html" %}
+        {% endfor %}
     </div>
 </div>
-
-<!-- Out-of-band update for title data when switching lists -->
-<div id="title-data" 
-     hx-swap-oob="true"
-     data-list-name="{{ current_list.name }}" 
-     data-incomplete-count="{{ todos | selectattr('is_completed', 'false') | list | length }}"
-     style="display: none;"></div>

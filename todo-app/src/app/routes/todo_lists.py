@@ -176,17 +176,9 @@ async def update_list(
     db.commit()
     db.refresh(list_obj)
 
-    # Get updated sidebar
-    lists = (
-        db.query(TodoList)
-        .filter(TodoList.user_id == user_id)
-        .order_by(TodoList.position)
-        .all()
-    )
-
     response = templates.TemplateResponse(
         request=request,
-        name="partials/todo_list_item.html",
+        name="partials/todo_list_item_with_oob.html",
         context={"list": list_obj, "active_list": list_obj},
     )
     return response

@@ -1,5 +1,21 @@
 // Todo App JavaScript
 
+// Update browser tab title based on incomplete todo count
+function updateBrowserTitle() {
+    const titleData = document.getElementById('title-data');
+    if (!titleData) return;
+    
+    const listName = titleData.dataset.listName;
+    const incompleteCount = parseInt(titleData.dataset.incompleteCount) || 0;
+    
+    if (listName) {
+        const prefix = incompleteCount > 0 ? `(${incompleteCount}) ` : '';
+        document.title = `${prefix}${listName} - Todo App`;
+    } else {
+        document.title = 'My Tasks - Todo App';
+    }
+}
+
 // Theme toggle
 function toggleTheme() {
     const body = document.body;
@@ -29,6 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('sl-theme-dark');
         if (icon) icon.name = 'sun';
     }
+    
+    // Initialize browser title
+    updateBrowserTitle();
 });
 
 // Initialize SortableJS for list reordering (sidebar)
@@ -89,6 +108,9 @@ document.body.addEventListener('htmx:afterSwap', (evt) => {
     if (evt.detail.target.id === 'todos-list' || evt.detail.target.id === 'main-content') {
         initTodoSortable();
     }
+    
+    // Update browser title when title-data is updated
+    updateBrowserTitle();
 });
 
 // Edit list dialog - uses data attributes for XSS safety

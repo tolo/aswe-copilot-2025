@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ active_list.name if active_list else 'My Tasks' }} - Todo App{% endblock %}
+{% block title %}{% if active_list %}{% set incomplete_count = active_list.todos | selectattr('is_completed', 'false') | list | length %}{% if incomplete_count > 0 %}({{ incomplete_count }}) {% endif %}{{ active_list.name }}{% else %}My Tasks{% endif %} - Todo App{% endblock %}
 
 {% block body %}
 <div class="app-layout">
@@ -21,6 +21,12 @@
             </sl-button>
         </div>
     </header>
+
+    <!-- Hidden element to store list info for title updates -->
+    <div id="title-data" 
+         data-list-name="{{ active_list.name if active_list else '' }}" 
+         data-incomplete-count="{% if active_list %}{{ active_list.todos | selectattr('is_completed', 'false') | list | length }}{% else %}0{% endif %}"
+         style="display: none;"></div>
 
     <!-- Main content -->
     <div class="app-content">
