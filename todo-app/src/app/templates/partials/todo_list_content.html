@@ -31,16 +31,64 @@
     <!-- Search -->
     <div class="search-bar">
         <sl-input
+            id="todo-search"
             placeholder="Search todos..."
             clearable
             hx-get="/api/todos/search"
             hx-trigger="keyup changed delay:300ms, search"
             hx-target="#todos-list"
             hx-swap="innerHTML"
-            hx-vals='{"list_id": "{{ current_list.id }}"}'
+            hx-vals='js:{"list_id": "{{ current_list.id }}", "priority": getActivePriority()}'
             name="q">
             <sl-icon slot="prefix" name="search"></sl-icon>
         </sl-input>
+    </div>
+
+    <!-- Priority Filter -->
+    <div class="priority-filter">
+        <sl-button-group label="Filter by priority">
+            <sl-button 
+                size="small" 
+                variant="primary"
+                data-priority=""
+                hx-get="/api/todos/search"
+                hx-target="#todos-list"
+                hx-swap="innerHTML"
+                hx-vals='js:{"list_id": "{{ current_list.id }}", "priority": "", "q": getSearchQuery()}'
+                onclick="setActiveFilter(this)">
+                All
+            </sl-button>
+            <sl-button 
+                size="small"
+                data-priority="low"
+                hx-get="/api/todos/search"
+                hx-target="#todos-list"
+                hx-swap="innerHTML"
+                hx-vals='js:{"list_id": "{{ current_list.id }}", "priority": "low", "q": getSearchQuery()}'
+                onclick="setActiveFilter(this)">
+                Low
+            </sl-button>
+            <sl-button 
+                size="small"
+                data-priority="medium"
+                hx-get="/api/todos/search"
+                hx-target="#todos-list"
+                hx-swap="innerHTML"
+                hx-vals='js:{"list_id": "{{ current_list.id }}", "priority": "medium", "q": getSearchQuery()}'
+                onclick="setActiveFilter(this)">
+                Medium
+            </sl-button>
+            <sl-button 
+                size="small"
+                data-priority="high"
+                hx-get="/api/todos/search"
+                hx-target="#todos-list"
+                hx-swap="innerHTML"
+                hx-vals='js:{"list_id": "{{ current_list.id }}", "priority": "high", "q": getSearchQuery()}'
+                onclick="setActiveFilter(this)">
+                High
+            </sl-button>
+        </sl-button-group>
     </div>
 
     <!-- Quick add todo -->

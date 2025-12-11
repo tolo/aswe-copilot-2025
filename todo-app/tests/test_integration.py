@@ -107,8 +107,10 @@ class TestUserJourneys:
 
     def test_delete_user_cascades_to_lists_and_todos(self, db_session):
         """Test that deleting a user cascades to all their lists and todos."""
+        import bcrypt
         # Create user
-        user = User(email="cascade@example.com", password="cascade123")
+        hashed_password = bcrypt.hashpw(b"cascade123", bcrypt.gensalt())
+        user = User(email="cascade@example.com", password=hashed_password.decode('utf-8'))
         db_session.add(user)
         db_session.commit()
 

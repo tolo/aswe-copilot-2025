@@ -275,6 +275,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Priority filter state management
+function setActiveFilter(button) {
+    // Remove primary variant from all filter buttons
+    const filterGroup = button.closest('sl-button-group');
+    if (filterGroup) {
+        filterGroup.querySelectorAll('sl-button').forEach(btn => {
+            btn.setAttribute('variant', 'default');
+            btn.removeAttribute('aria-pressed');
+        });
+    }
+    
+    // Set clicked button to primary with ARIA support
+    button.setAttribute('variant', 'primary');
+    button.setAttribute('aria-pressed', 'true');
+}
+
+function getActivePriority() {
+    const activeButton = document.querySelector('.priority-filter sl-button[variant="primary"]');
+    return activeButton ? activeButton.dataset.priority : '';
+}
+
+function getSearchQuery() {
+    const searchInput = document.getElementById('todo-search');
+    return searchInput ? (searchInput.value || '') : '';
+}
+
+// Re-initialize filter state after HTMX swaps
+document.body.addEventListener('htmx:afterSwap', (evt) => {
+    if (evt.detail.target.id === 'todos-list' || evt.detail.target.id === 'main-content') {
+        initTodoSortable();
+        
+        // Reset "All" filter to active if no filter is set
+        const filterGroup = document.querySelector('.priority-filter sl-button-group');
+        if (filterGroup && !filterGroup.querySelector('sl-button[variant="primary"]')) {
+            const allButton = filterGroup.querySelector('sl-button[data-priority=""]');
+            if (allButton) {
+                allButton.setAttribute('variant', 'primary');
+                allButton.setAttribute('aria-pressed', 'true');
+            }
+        }
+    }
+});
+
 // HTMX error handling
 document.body.addEventListener('htmx:responseError', (evt) => {
     console.error('HTMX Error:', evt.detail);

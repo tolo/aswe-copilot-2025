@@ -78,5 +78,6 @@
     // ─────────────────────────────────────────────────────────────────────────
     "/^docker\\s+(rm|rmi|system\\s+prune)\\b/": false,
     "/^docker-compose\\s+down\\b/": false
-  }
+  },
+  "python.analysis.typeCheckingMode": "basic"
 }

@@ -346,6 +346,39 @@ body {
     padding-left: 8px;
 }
 
+/* Priority filter */
+.priority-filter {
+    margin-bottom: 16px;
+}
+
+.priority-filter sl-button-group {
+    display: flex;
+    width: 100%;
+}
+
+.priority-filter sl-button {
+    flex: 1;
+}
+
+/* Ensure filter buttons are visually distinct when active */
+.priority-filter sl-button[variant="primary"]::part(base) {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+/* Responsive: Stack filters on mobile if needed */
+@media (max-width: 480px) {
+    .priority-filter sl-button-group {
+        flex-wrap: wrap;
+    }
+    
+    .priority-filter sl-button {
+        flex: 1 1 45%;
+        min-width: 80px;
+    }
+}
+
 .auth-form sl-input::part(prefix) {
     padding-left: 12px;
 }

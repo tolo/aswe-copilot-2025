@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Form, Request, Response
+from fastapi import APIRouter, Depends, Form, Query, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func
@@ -43,9 +43,10 @@ async def search_todos(
     user_id: Annotated[str, Depends(get_current_user_id)],
     list_id: str,
     q: str = "",
+    priority: str = "",
     db: Session = Depends(get_db),
 ):
-    """Search todos by title in a specific list."""
+    """Search todos by title and/or priority in a specific list."""
     # Verify list access
     list_obj = _verify_list_access(db, list_id, user_id)
     if not list_obj:
@@ -60,6 +61,10 @@ async def search_todos(
 
     if q.strip():
         query = query.filter(Todo.title.ilike(f"%{q.strip()}%"))
+
+    # Filter by priority if specified (only valid values)
+    if priority and priority in ("low", "medium", "high"):
+        query = query.filter(Todo.priority == priority)
 
     todos = query.order_by(Todo.position).all()
 
@@ -136,27 +141,29 @@ async def create_todo(
 async def get_todo(
     request: Request,
     todo_id: str,
+    list_id: Annotated[str, Query()],
     user_id: Annotated[str, Depends(get_current_user_id)],
     db: Session = Depends(get_db),
 ):
     """Get a single todo item."""
-    todo = db.query(Todo).filter(Todo.id == todo_id).first()
-    if not todo:
-        return templates.TemplateResponse(
-            request=request,
-            name="partials/error.html",
-            context={"error": "Todo not found"},
-            status_code=404,
-        )
-
-    # Verify access
-    list_obj = _verify_list_access(db, todo.list_id, user_id)
+    # Verify list access first
+    list_obj = _verify_list_access(db, list_id, user_id)
     if not list_obj:
         return templates.TemplateResponse(
             request=request,
             name="partials/error.html",
             context={"error": "Not authorized"},
             status_code=403,
+        )
+    
+    # Get todo and verify it belongs to the specified list
+    todo = db.query(Todo).filter(Todo.id == todo_id, Todo.list_id == list_id).first()
+    if not todo:
+        return templates.TemplateResponse(
+            request=request,
+            name="partials/error.html",
+            context={"error": "Todo not found"},
+            status_code=404,
         )
 
     return templates.TemplateResponse(
@@ -248,6 +255,7 @@ async def toggle_todo(
     db: Session = Depends(get_db),
 ):
     """Toggle todo completion status."""
+    # Get todo first to find its list
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if not todo:
         return templates.TemplateResponse(
@@ -257,7 +265,7 @@ async def toggle_todo(
             status_code=404,
         )
 
-    # Verify access
+    # Verify user owns the list (ensures user owns this todo)
     list_obj = _verify_list_access(db, todo.list_id, user_id)
     if not list_obj:
         return templates.TemplateResponse(
@@ -291,11 +299,12 @@ async def delete_todo(
     db: Session = Depends(get_db),
 ):
     """Delete a todo item."""
+    # Get todo first to find its list
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if not todo:
         return Response(status_code=404)
 
-    # Verify access
+    # Verify user owns the list (ensures user owns this todo)
     list_obj = _verify_list_access(db, todo.list_id, user_id)
     if not list_obj:
         return Response(status_code=403)
@@ -315,11 +324,12 @@ async def reorder_todo(
     db: Session = Depends(get_db),
 ):
     """Reorder a todo to a new position (drag-drop)."""
+    # Get todo first to find its list
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if not todo:
         return Response(status_code=404)
 
-    # Verify access
+    # Verify user owns the list (ensures user owns this todo)
     list_obj = _verify_list_access(db, todo.list_id, user_id)
     if not list_obj:
         return Response(status_code=403)

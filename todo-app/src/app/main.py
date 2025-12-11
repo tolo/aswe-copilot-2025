@@ -2,6 +2,7 @@
 
 from contextlib import asynccontextmanager
 
+import bcrypt
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -24,10 +25,11 @@ def seed_demo_data():
         if demo_user:
             return
 
-        # Create demo user
+        # Create demo user with hashed password
+        hashed_password = bcrypt.hashpw(b"demo123", bcrypt.gensalt())
         demo_user = User(
             email="demo@example.com",
-            password="demo123",
+            password=hashed_password.decode('utf-8'),
         )
         db.add(demo_user)
         db.commit()

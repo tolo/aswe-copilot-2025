@@ -2,6 +2,7 @@
 
 from typing import Annotated
 
+import bcrypt
 from fastapi import APIRouter, Depends, Form, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -49,9 +50,9 @@ async def login(
             context={"error": "Invalid email format"},
         )
 
-    # Find user
+    # Find user and verify password
     user = db.query(User).filter(User.email == email).first()
-    if not user or user.password != password:
+    if not user or not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
         return templates.TemplateResponse(
             request=request,
             name="partials/error.html",
@@ -112,8 +113,9 @@ async def register(
             context={"error": "Email already registered"},
         )
 
-    # Create user
-    user = User(email=email, password=password)
+    # Create user with hashed password
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    user = User(email=email, password=hashed_password.decode('utf-8'))
     db.add(user)
     db.commit()
     db.refresh(user)

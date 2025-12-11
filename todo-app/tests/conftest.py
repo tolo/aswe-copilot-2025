@@ -55,11 +55,13 @@ def client(db_session):
 @pytest.fixture
 def test_user(db_session):
     """Create a test user."""
+    import bcrypt
     from app.database import User
 
+    hashed_password = bcrypt.hashpw(b"testpass123", bcrypt.gensalt())
     user = User(
         email="test@example.com",
-        password="testpass123",
+        password=hashed_password.decode('utf-8'),
     )
     db_session.add(user)
     db_session.commit()
