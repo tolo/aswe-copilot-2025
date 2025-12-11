@@ -59,7 +59,8 @@ class TestBrowserTitleCount:
         # Check title doesn't contain count
         content = response.content.decode()
         assert f"<title>{test_list.name} - Todo App</title>" in content
-        assert "(" not in content or "(0)" not in content
+        # Ensure no count is shown (no parentheses in title)
+        assert "<title>(" not in content
 
     def test_title_update_oob_on_toggle(self, authenticated_client, test_todo, db_session):
         """Test that toggling a todo returns OOB update for title."""
